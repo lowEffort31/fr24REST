@@ -1,6 +1,10 @@
 # FlightRadar24 REST API (Native Node.js)
 
 <p align="center">
+  [Auf Deutsch lesen (German) 🇩🇪](README_DE.md)
+</p>
+
+<p align="center">
   <a href="https://vercel.com">
     <img src="https://img.shields.io/badge/Vercel-Serverless-000000?style=flat-square&logo=vercel&logoColor=white" alt="Vercel Deployment">
   </a>
@@ -45,10 +49,10 @@ A high-performance, native REST-API for FlightRadar24 flight data, optimized for
 
 ## 🏗 Architecture & Cleanup
 
-Das Projekt wurde für maximale Wartbarkeit und Performanz optimiert:
-- **Unified Logic**: Alle API-Routen und Logiken befinden sich zentral in `app.js`.
-- **Local & Serverless**: Sowohl `server.js` (lokal) als auch `api/fr24/index.js` (Vercel) nutzen den identischen Code. Keine doppelten Anpassungen mehr nötig!
-- **Vercel Ready**: Dank `vercel.json` wird das gesamte Projekt (inkl. Frontend) nahtlos in der Cloud ausgeführt.
+The project has been optimized for maximum maintainability and performance:
+- **Unified Logic**: All API routes and business logic are centralized in `app.js`.
+- **Local & Serverless**: Both `server.js` (local) and `api/fr24/index.js` (Vercel) use identical code. No more duplicate updates!
+- **Vercel Ready**: Thanks to `vercel.json`, the entire project (including the UI) executes seamlessly in the cloud.
 
 ---
 
@@ -68,7 +72,9 @@ cp .env.example .env
 node server.js
 ```
 
-Das Projekt enthält eine integrierte, stylische Konsole zum visuellen Testen der API. Starte den Server und öffne:
+## 🖥 Web Console
+
+The project includes an integrated, stylish console for visual API testing. Start the server and open:
 **[http://localhost:3000](http://localhost:3000)**
 
 ![API Console Preview](public/assets/console_preview.png)
@@ -77,7 +83,7 @@ Das Projekt enthält eine integrierte, stylische Konsole zum visuellen Testen de
 
 ## 📥 API Collection
 
-Für schnelles Testen mit **Insomnia** oder **Postman** kannst du die mitgelieferte Collection importieren:
+For quick testing with **Insomnia** or **Postman**, you can import the included collection:
 👉 [insomnia_collection.json](insomnia_collection.json)
 
 ---
@@ -116,7 +122,7 @@ console.log(`Tracking flight ${data.id} (${data.callsign})`);
 
 ### 2. Extended Data (Opt-in)
 
-Include airplane photos and full historical coordinate trails.
+Includes airplane photos and full historical coordinate trails.
 
 ```bash
 # Add photos and breadcrumb trail
@@ -128,10 +134,10 @@ curl -s "http://localhost:3000/api/flight/LH400?photos=true&trail=true"
 ## Authentication
 
 ### Native Auto-Login
-Wenn du deine Zugangsdaten in einer `.env` Datei speicherst (`FR24_EMAIL` & `FR24_PASSWORD`), authentifiziert sich die API bei Bedarf automatisch. 
+If you store your credentials in a `.env` file (`FR24_EMAIL` & `FR24_PASSWORD`), the API will automatically authenticate when needed.
 
-### Manueller Login
-Alternativ kannst du den `/api/login` Endpoint nutzen:
+### Manual Login
+Alternatively, you can use the `/api/login` endpoint:
 
 #### JavaScript (Login)
 ```javascript
@@ -145,7 +151,7 @@ const result = await response.json();
 console.log("Login Status:", result.success);
 ```
 
-### For /api/flight/:code
+### Parameters for /api/flight/:code
 | Parameter | Type | Description |
 | :--- | :--- | :--- |
 | `full` | `boolean` | Returns the entire raw dataset and all breadcrumbs. |
@@ -153,7 +159,7 @@ console.log("Login Status:", result.success);
 | `trail` | `boolean` | (Opt-in) Includes detailed flight path coordinates. |
 | `airports` | `boolean` | (Opt-in) Includes full metadata for origin/destination. |
 
-### For /api/airports/:code
+### Parameters for /api/airports/:code
 | Parameter | Type | Description |
 | :--- | :--- | :--- |
 | `weather` | `boolean` | (Opt-in) Includes current METAR and weather data. |
@@ -165,7 +171,7 @@ console.log("Login Status:", result.success);
 
 ## ☁️ Vercel Serverless Deployment
 
-Deploying to Vercel is streamlined for stateless execution:
+Deployment to Vercel is streamlined for stateless execution:
 
 ```bash
 vercel --prod
@@ -181,8 +187,8 @@ vercel --prod
 ## ⚖️ Disclaimer
 
 > [!CAUTION]
-> ### NUR UND AUSSCHLIESSLICH FÜR EDUCATIONAL PURPOSES
-> Dieses Projekt dient **einzig und allein Bildungszwecken**. Es soll demonstrieren, wie man mit nativen Node.js-Tools mit öffentlichen APIs interagiert. Die Nutzung erfolgt auf eigene Gefahr. Bitte respektiere die Terms of Service von FlightRadar24. Der Autor übernimmt keine Haftung für Missbrauch oder Schäden.
+> ### STRICTLY AND EXCLUSIVELY FOR EDUCATIONAL PURPOSES
+> This project is for **educational purposes only**. It is intended to demonstrate how to interact with public APIs using native Node.js tools. Use it at your own risk. Please respect the Terms of Service of FlightRadar24. The author is not responsible for any misuse or damage.
 
 ---
 
@@ -195,13 +201,13 @@ vercel --prod
 </div>
 
 ## Repository Structure
-- `app.js`: Zentrale Express-App (Shared Logic).
-- `/api/fr24/`: Vercel Serverless Entry Point.
-- `/services/`: Core Request- & Scraper-Logik.
-- `/models/`: Daten-Mapping & Entity-Definitionen.
+- `app.js`: Central Express app (Shared logic).
+- `/api/fr24/`: Vercel Serverless entry point.
+- `/services/`: Core request and scraper logic.
+- `/models/`: Data mapping and entity definitions.
 - `/public/`: Frontend (Interactive Console).
-- `server.js`: Lokaler Express Listener.
-- `vercel.json`: Vercel Routing & Konfiguration.
+- `server.js`: Local Express listener.
+- `vercel.json`: Vercel routing and configuration.
 
 ---
 
