@@ -1,96 +1,143 @@
-# FlightRadar24 REST API (Native Node.js/Express)
+# FlightRadar24 REST API (Native Node.js)
 
-Eine vollständig native REST-API für FlightRadar24 Flugdaten, ohne externe SDK-Abhängigkeiten.
+<p align="center">
+  <a href="https://vercel.com">
+    <img src="https://img.shields.io/badge/Vercel-Serverless-000000?style=flat-square&logo=vercel&logoColor=white" alt="Vercel Deployment">
+  </a>
+  <a href="https://nodejs.org">
+    <img src="https://img.shields.io/badge/Node.js-18+-339933?style=flat-square&logo=node.js&logoColor=white" alt="Node.js Version">
+  </a>
+  <a href="https://opensource.org/licenses/MIT">
+    <img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square" alt="License: MIT">
+  </a>
+</p>
 
-## Installation
+A high-performance, native REST-API for FlightRadar24 flight data, optimized for local development and Vercel Serverless. Designed without external SDK dependencies, using pure Node.js.
 
-1. Repository klonen oder Dateien kopieren.
-2. Abhängigkeiten installieren:
-   ```bash
-   npm install
-   ```
-3. Server starten:
-   ```bash
-   node server.js
-   ```
+<p align="center">
+  <a href="#quickstart">Quickstart</a> •
+  <a href="#usage-examples">Usage</a> •
+  <a href="#authentication">Authentication</a> •
+  <a href="#vercel-serverless-deployment">Deployment</a> •
+  <a href="#disclaimer">Disclaimer</a>
+</p>
 
-Der Server läuft standardmäßig auf `http://localhost:3000`.
+---
 
-## API Endpunkte & Nutzung (Beispiele)
-
-### 1. Flugsuche & Details (`/api/flight/:code`)
-Sucht nach einem Flug via ID (Hex) oder Flugnummer (Callsign).
-
-**Optionale Parameter (Opt-in):**
-- `full=true`: Liefert absolut alle verfügbaren Daten (inkl. Rohdaten).
-- `photos=true`: Inkludiert hochauflösende Bilder des Flugzeugs.
-- `trail=true`: Inkludiert den detaillierten Flugverlauf (Koordinaten).
-- `airports=true`: Liefert vollständige Flughafen-Details (Position, Timezone, Website).
-
-Ohne diese Parameter ist der Response sehr schlank und auf das Wesentliche reduziert.
-
-#### curl (Linux/macOS):
-> [!IMPORTANT]
-> In Shells wie **zsh** (Standard auf macOS) müssen URLs mit Query-Parametern (wie `?full=true`) in Anführungszeichen gesetzt werden, sonst tritt ein Fehler wie `no matches found` auf.
+## Quickstart
 
 ```bash
-# Zusammenfassung (Standard)
+git clone https://github.com/jonaskroedel/fr24REST.git
+cd fr24REST
+npm install
+node server.js
+```
+
+## Usage Examples
+
+This is a standard REST API and can be integrated into any environment.
+
+### 1. Simple Fetch (Summary Mode)
+
+Returns essential data (ID, number, aircraft, origin, destination, status).
+
+#### cURL
+```bash
 curl -s "http://localhost:3000/api/flight/LH400"
-
-# Vollständige Daten (inkl. Trail)
-curl -s "http://localhost:3000/api/flight/LH400?full=true"
 ```
 
-#### PowerShell (Windows):
-```powershell
-# Zusammenfassung
-Invoke-RestMethod -Uri "http://localhost:3000/api/flight/LH400"
+#### Python (requests)
+```python
+import requests
 
-# Vollständige Daten
-Invoke-RestMethod -Uri "http://localhost:3000/api/flight/LH400?full=true"
+response = requests.get("http://localhost:3000/api/flight/LH400")
+data = response.json()
+print(f"Flight: {data['data']['number']} - Status: {data['data']['status']['text']}")
 ```
 
-### 2. Live-Flüge (`/api/flights`)
-Liefert alle aktuellen Flüge in einer Zone oder für eine Airline.
+#### JavaScript (Fetch)
+```javascript
+const response = await fetch("http://localhost:3000/api/flight/LH400");
+const { data } = await response.json();
+console.log(`Tracking flight ${data.id} (${data.callsign})`);
+```
+
+### 2. Extended Data (Opt-in)
+
+Include airplane photos and full historical coordinate trails.
 
 ```bash
-# Flüge über Europa
-curl -s "http://localhost:3000/api/flights?zone=europe"
-
-# Flüge einer Airline (ICAO Code)
-curl -s "http://localhost:3000/api/flights?airline=DLH"
+# Add photos and breadcrumb trail
+curl -s "http://localhost:3000/api/flight/LH400?photos=true&trail=true"
 ```
 
-### 3. Login (`/api/login`)
-Authentifiziert den Service bei FlightRadar24 für den Zugriff auf erweiterte Daten.
+---
+
+## Authentication
+
+### Login required for more insights
+Certain data fields (like advanced history or restricted flight details) may require a valid session. Use the `/api/login` endpoint to authenticate.
+
+#### Python (Login & Authenticated Request)
+```python
+import requests
+
+# 1. Login to get session data
+credentials = {"email": "your@email.com", "password": "yourpassword"}
+login_res = requests.post("http://localhost:3000/api/login", json=credentials)
+session_data = login_res.json()
+
+# 2. subsequent requests use the session cookies
+# Note: The serverless version requires you to manage session persistence if needed.
+print("Successfully logged in:", session_data['success'])
+```
+
+#### JavaScript (Login)
+```javascript
+const credentials = { email: "your@email.com", password: "yourpassword" };
+const response = await fetch("http://localhost:3000/api/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(credentials)
+});
+const result = await response.json();
+console.log("Login Status:", result.success);
+```
+
+---
+
+## Vercel Serverless Deployment
+
+Deploying to Vercel is streamlined for stateless execution:
 
 ```bash
-curl -X POST http://localhost:3000/api/login \
-     -H "Content-Type: application/json" \
-     -d '{"email":"your@email.com", "password":"yourpassword"}'
+vercel --prod
 ```
 
-### 4. Sonstige Endpunkte
-- `GET /api/airlines`: Liste aller Airlines.
-- `GET /api/zones`: Statische Koordinaten der Regionen.
-- `GET /api/airports/:code`: Details zu einem Flughafen (IATA Code).
+## Disclaimer
 
-## Struktur
-- `/api/fr24/index.js`: Entrypoint für **Vercel Serverless** Funktionen.
-- `/services/fr24.service.js`: Zentrale Logik für Scraper & Requests.
-- `/models/entities.js`: Datenmodelle & Mapping.
-- `server.js`: Lokaler Express Server (für Entwicklung).
-- `vercel.json`: Konfiguration für das Routing auf Vercel.
+> [!WARNING]
+> This project is for **educational purposes only**. It is intended to demonstrate how to interact with public APIs using native Node.js. Use it responsibly and respect the Terms of Service of FlightRadar24. The author is not responsible for any misuse of this software.
 
-## Vercel Deployment (Serverless)
+---
 
-Diese API ist für das Deployment auf **Vercel** optimiert. Da Serverless-Funktionen zustandslos sind, werden Login-Sessions (Cookies) nicht dauerhaft auf dem Server gespeichert. Jede Anfrage ist unabhängig.
+## Star History
 
-**Deployment-Schritte:**
-1. Installiere das Vercel CLI: `npm i -g vercel`
-2. Führe das Deployment aus:
-   ```bash
-   vercel
-   ```
+<div align="center">
+  <a href="https://star-history.com/#jonaskroedel/fr24REST&Date">
+    <img src="https://api.star-history.com/svg?repos=jonaskroedel/fr24REST&type=Date" width="600" alt="Star History Chart">
+  </a>
+</div>
 
-Die API ist dann unter `https://dein-projekt.vercel.app/api/...` erreichbar. Das Routing wird automatisch durch die `vercel.json` an den Unterordner `/api/fr24` weitergeleitet.
+## Repository Structure
+- `/api/fr24/`: Vercel Serverless function entry point.
+- `/services/`: Core request and scraper logic.
+- `/models/`: Data mapping and entity definitions.
+- `server.js`: Local development listener.
+- `vercel.json`: Vercel routing configuration.
+
+---
+
+<p align="center">
+  Built by <a href="https://github.com/jonaskroedel">jonaskroedel</a> with ♥ for Flight Enthusiasts
+</p>
