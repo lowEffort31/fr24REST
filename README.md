@@ -1,4 +1,9 @@
-# FlightRadar24 REST API (Native Node.js)
+# <p align="center">LIFT</p>
+
+<p align="center">
+  <b>/lɪft/ — Lightweight Interface for Flight Tracking</b><br>
+  <i>The high-performance, native flight tracking engine for Node.js. Lightweight by design. Native by heart. 28KB of pure Serverless power.</i>
+</p>
 
 <p align="center">
   <a href="README_DE.md">Auf Deutsch lesen (German) 🇩🇪</a>
@@ -18,23 +23,13 @@
   <img src="https://img.shields.io/github/actions/workflow/status/jonaskroedel/fr24REST/ci.yml?branch=main&style=flat-square" alt="Build Status">
 </p>
 
-A high-performance, native REST-API for FlightRadar24 flight data, optimized for local development and Vercel Serverless. Designed without external SDK dependencies, using pure Node.js.
+---
 
-<p align="center">
-  <a href="#quickstart">Quickstart</a> •
-  <a href="#web-console">Web Console</a> •
-  <a href="#usage-examples">Usage Examples</a> •
-  <a href="#authentication">Authentication</a> •
-  <a href="#vercel-serverless-deployment">Deployment</a> •
-  <a href="#roadmap">Roadmap</a> •
-  <a href="#disclaimer">Disclaimer</a>
-</p>
+## 💡 Why LIFT?
 
-<p align="center">
-  <img src="https://img.shields.io/github/last-commit/jonaskroedel/fr24REST?style=flat-square&color=blue" alt="Last Commit">
-  <img src="https://img.shields.io/github/issues/jonaskroedel/fr24REST?style=flat-square&color=blue" alt="Issues">
-  <img src="https://img.shields.io/github/languages/top/jonaskroedel/fr24REST?style=flat-square" alt="Top Language">
-</p>
+I started this project because I wanted to understand exactly how global flight tracking data can be accessed and processed at scale. After looking at existing libraries and SDKs, I realized that most of them were either bloated, outdated, or lacked the "elegance" of a native Node.js implementation. 
+
+LIFT was born from the desire to create something **lighter**, **faster**, and **more beautiful** than any other solution out there.
 
 ---
 
@@ -47,12 +42,12 @@ A high-performance, native REST-API for FlightRadar24 flight data, optimized for
   <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript">
 </div>
 
-## 🏗 Architecture & Cleanup
+## 🏗 Architecture & Optimization
 
 The project has been optimized for maximum maintainability and performance:
 - **Unified Logic**: All API routes and business logic are centralized in `app.js`.
-- **Local & Serverless**: Both `server.js` (local) and `api/fr24/index.js` (Vercel) use identical code. No more duplicate updates!
-- **Vercel Ready**: Thanks to `vercel.json`, the entire project (including the UI) executes seamlessly in the cloud.
+- **Local & Serverless**: Both `server.js` (local) and `api/fr24/index.js` (Vercel) use identical code. No more redundant updates!
+- **Vercel Ready**: The entire project (including the UI) executes seamlessly in the cloud.
 
 ---
 
@@ -66,15 +61,17 @@ npm install
 
 # Setup Environment (Optional for Auto-Auth)
 cp .env.example .env
-# Edit .env with your FR24 credentials
+# Edit .env with your credentials
 
 # Start Server
 node server.js
 ```
 
+![API Demo](public/assets/demo.gif)
+
 ## 🖥 Web Console
 
-The project includes an integrated, stylish console for visual API testing. Start the server and open:
+LIFT includes an integrated, stylish console for visual API testing. Start the server and open:
 **[http://localhost:3000](http://localhost:3000)**
 
 ![API Console Preview](public/assets/console_preview.png)
@@ -90,9 +87,9 @@ For quick testing with **Insomnia** or **Postman**, you can import the included 
 
 ## Usage Examples
 
-This is a standard REST API and can be integrated into any environment.
+LIFT is a standard REST API and can be integrated into any project.
 
-### 1. Simple Fetch (Summary Mode)
+### 1. Simple Flight Lookup
 
 Returns essential data (ID, number, aircraft, origin, destination, status).
 
@@ -134,10 +131,10 @@ curl -s "http://localhost:3000/api/flight/LH400?photos=true&trail=true"
 ## Authentication
 
 ### Native Auto-Login
-If you store your credentials in a `.env` file (`FR24_EMAIL` & `FR24_PASSWORD`), the API will automatically authenticate when needed.
+If you store your credentials in a `.env` file (`FR24_EMAIL` & `FR24_PASSWORD`), LIFT will automatically authenticate when needed.
 
 ### Manual Login
-Alternatively, you can use the `/api/login` endpoint:
+Alternatively, you can use the `/api/login` endpoint directly:
 
 #### JavaScript (Login)
 ```javascript

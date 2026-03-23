@@ -1,4 +1,9 @@
-# FlightRadar24 REST API (Nativ Node.js)
+# <p align="center">LIFT</p>
+
+<p align="center">
+  <b>/lɪft/ — Lightweight Interface for Flight Tracking</b><br>
+  <i>Die hochperformante, native Flight-Tracking-Engine für Node.js. Schlank im Design. Nativ im Herzen. 28 KB pure Serverless-Power.</i>
+</p>
 
 <p align="center">
   <a href="README.md">Read in English (English) 🇺🇸</a>
@@ -14,31 +19,21 @@
   <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square" alt="Lizenz: MIT">
   </a>
-  <img src="https://img.shields.io/github/languages/code-size/jonaskroedel/fr24REST?style=flat-square" alt="Code Größe">
-  <img src="https://img.shields.io/github/actions/workflow/status/jonaskroedel/fr24REST/ci.yml?branch=main&style=flat-square" alt="Build Status">
-</p>
-
-Eine hochperformante, native REST-API für FlightRadar24-Flugdaten, optimiert für lokale Entwicklung und Vercel Serverless. Entwickelt ohne externe SDK-Abhängigkeiten, unter Verwendung von reinem Node.js.
-
-<p align="center">
-  <a href="#schnellstart">Schnellstart</a> •
-  <a href="#web-konsole">Web Konsole</a> •
-  <a href="#anwendungsbeispiele">Beispiele</a> •
-  <a href="#authentifizierung">Authentifizierung</a> •
-  <a href="#vercel-serverless-deployment">Deployment</a> •
-  <a href="#roadmap">Roadmap</a> •
-  <a href="#haftungsausschluss">Haftungsausschluss</a>
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/github/last-commit/jonaskroedel/fr24REST?style=flat-square&color=blue" alt="Letzter Commit">
-  <img src="https://img.shields.io/github/issues/jonaskroedel/fr24REST?style=flat-square&color=blue" alt="Issues">
-  <img src="https://img.shields.io/github/languages/top/jonaskroedel/fr24REST?style=flat-square" alt="Top Sprache">
+  <img src="https://img.shields.io/github/languages/code-size/jonaskroedel/fr24REST?style=flat-square" alt="Code-Größe">
+  <img src="https://img.shields.io/github/actions/workflow/status/jonaskroedel/fr24REST/ci.yml?branch=main&style=flat-square" alt="Build-Status">
 </p>
 
 ---
 
-## 🛠 Tech Stack
+## 💡 Warum LIFT?
+
+Ich habe dieses Projekt gestartet, weil ich genau verstehen wollte, wie globale Flugdaten in großem Maßstab abgerufen und verarbeitet werden können. Nachdem ich mir bestehende Bibliotheken und SDKs angesehen hatte, wurde mir klar, dass die meisten entweder aufgebläht oder veraltet waren oder nicht die "Eleganz" einer nativen Node.js-Implementierung besaßen.
+
+LIFT wurde aus dem Wunsch heraus geboren, etwas **Schlankeres**, **Schnelleres** und **Schöneres** zu schaffen als jede andere Lösung da draußen.
+
+---
+
+## 🛠 Tech-Stack
 
 <div align="center">
   <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js">
@@ -47,12 +42,12 @@ Eine hochperformante, native REST-API für FlightRadar24-Flugdaten, optimiert f�
   <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript">
 </div>
 
-## 🏗 Architektur & Bereinigung
+## 🏗 Architektur & Optimierung
 
 Das Projekt wurde für maximale Wartbarkeit und Performanz optimiert:
-- **Unified Logic**: Alle API-Routen und Logiken befinden sich zentral in `app.js`.
-- **Lokal & Serverless**: Sowohl `server.js` (lokal) als auch `api/fr24/index.js` (Vercel) nutzen den identischen Code. Keine doppelten Anpassungen mehr nötig!
-- **Vercel Ready**: Dank `vercel.json` wird das gesamte Projekt (inkl. Frontend) nahtlos in der Cloud ausgeführt.
+- **Unified Logic**: Alle API-Routen und die Geschäftslogik sind in `app.js` zentralisiert.
+- **Lokal & Serverless**: Sowohl `server.js` (lokal) als auch `api/fr24/index.js` (Vercel) nutzen denselben Code. Keine redundanten Updates mehr!
+- **Vercel Ready**: Das gesamte Projekt (einschließlich der UI) wird nahtlos in der Cloud ausgeführt.
 
 ---
 
@@ -64,35 +59,37 @@ git clone https://github.com/jonaskroedel/fr24REST.git
 cd fr24REST
 npm install
 
-# Umgebung einrichten (Optional für Auto-Auth)
+# Umgebung einrichten (Optional für Auto-Authentifizierung)
 cp .env.example .env
-# .env mit deinen FR24-Zugangsdaten bearbeiten
+# .env mit deinen Zugangsdaten bearbeiten
 
 # Server starten
 node server.js
 ```
 
-## 🖥 Web Konsole
+![API Demo](public/assets/demo.gif)
 
-Das Projekt enthält eine integrierte, stylische Konsole zum visuellen Testen der API. Starte den Server und öffne:
+## 🖥 Web-Konsole
+
+LIFT enthält eine integrierte, stylische Konsole zum visuellen Testen der API. Starte den Server und öffne:
 **[http://localhost:3000](http://localhost:3000)**
 
 ![API Console Preview](public/assets/console_preview.png)
 
 ---
 
-## 📥 API Kollektion
+## 📥 API-Kollektion
 
-Für schnelles Testen mit **Insomnia** oder **Postman** kannst du die mitgelieferte Collection importieren:
+Für schnelles Testen mit **Insomnia** oder **Postman** kannst du die mitgelieferte Kollektion importieren:
 👉 [insomnia_collection.json](insomnia_collection.json)
 
 ---
 
 ## Anwendungsbeispiele
 
-Dies ist eine Standard-REST-API und kann in jede Umgebung integriert werden.
+LIFT ist eine Standard-REST-API und kann in jedes Projekt integriert werden.
 
-### 1. Einfaches Abrufen (Zusammenfassung)
+### 1. Einfache Flugabfrage
 
 Gibt grundlegende Daten zurück (ID, Nummer, Flugzeug, Start, Ziel, Status).
 
@@ -134,10 +131,10 @@ curl -s "http://localhost:3000/api/flight/LH400?photos=true&trail=true"
 ## Authentifizierung
 
 ### Natives Auto-Login
-Wenn du deine Zugangsdaten in einer `.env` Datei speicherst (`FR24_EMAIL` & `FR24_PASSWORD`), authentifiziert sich die API bei Bedarf automatisch. 
+Wenn du deine Zugangsdaten in einer `.env` Datei speicherst (`FR24_EMAIL` & `FR24_PASSWORD`), authentifiziert sich LIFT bei Bedarf automatisch.
 
 ### Manueller Login
-Alternativ kannst du den `/api/login` Endpoint nutzen:
+Alternativ kannst du den `/api/login` Endpunkt direkt nutzen:
 
 #### JavaScript (Login)
 ```javascript
@@ -148,7 +145,7 @@ const response = await fetch("http://localhost:3000/api/login", {
     body: JSON.stringify(credentials)
 });
 const result = await response.json();
-console.log("Login Status:", result.success);
+console.log("Login-Status:", result.success);
 ```
 
 ### Parameter für /api/flight/:code
@@ -179,20 +176,20 @@ vercel --prod
 
 ## 🗺 Roadmap
 
-- [ ] **Echtzeit Webhook Support**: Push-Updates an externe Endpunkte.
-- [ ] **Protobuf Support**: Nativ dekodierte Daten für noch höhere Performance.
+- [ ] **Echtzeit-Webhook-Support**: Push-Updates an externe Endpunkte.
+- [ ] **Protobuf-Support**: Nativ dekodierte Daten für noch höhere Performance.
 - [ ] **Interaktive Karte**: Integration eines Leaflet/Mapbox-Frontends.
-- [ ] **Multi-Session Handling**: Unterstützung für mehrere Account-Cookies.
+- [ ] **Multi-Session-Handling**: Unterstützung für mehrere Account-Cookies.
 
 ## ⚖️ Haftungsausschluss
 
 > [!CAUTION]
 > ### NUR UND AUSSCHLIESSLICH FÜR BILDUNGSZWECKE
-> Dieses Projekt dient **einzig und allein Bildungszwecken**. Es soll demonstrieren, wie man mit nativen Node.js-Tools mit öffentlichen APIs interagiert. Die Nutzung erfolgt auf eigene Gefahr. Bitte respektiere die Terms of Service von FlightRadar24. Der Autor übernimmt keine Haftung für Missbrauch oder Schäden.
+> Dieses Projekt dient **einzig und allein Bildungszwecken**. Es soll demonstrieren, wie man mit nativen Node.js-Tools mit öffentlichen APIs interagiert. Die Nutzung erfolgt auf eigene Gefahr. Bitte respekiere die Terms of Service von FlightRadar24. Der Autor übernimmt keine Haftung für Missbrauch oder Schäden.
 
 ---
 
-## Star History
+## Star-History
 
 <div align="center">
   <a href="https://star-history.com/#jonaskroedel/fr24REST&Date">
@@ -200,10 +197,10 @@ vercel --prod
   </a>
 </div>
 
-## Repository Struktur
-- `app.js`: Zentrale Express-App (Gemeinsame Logik).
+## Repository-Struktur
+- `app.js`: Zentrale Express-App (Shared Logic).
 - `/api/fr24/`: Vercel Serverless Einstiegspunkt.
-- `/services/`: Kern-Anfrage & Scraper-Logik.
+- `/services/`: Kern-Anfrage- & Scraper-Logik.
 - `/models/`: Daten-Mapping & Entity-Definitionen.
 - `/public/`: Frontend (Interaktive Konsole).
 - `server.js`: Lokaler Express Listener.
