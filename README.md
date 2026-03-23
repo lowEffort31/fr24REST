@@ -68,10 +68,10 @@ cp .env.example .env
 node server.js
 ```
 
-## 🖥 Web Console
-
 Das Projekt enthält eine integrierte, stylische Konsole zum visuellen Testen der API. Starte den Server und öffne:
 **[http://localhost:3000](http://localhost:3000)**
+
+![API Console Preview](public/assets/console_preview.png)
 
 ---
 
@@ -178,10 +178,11 @@ vercel --prod
 - [ ] **Interactive Map**: Integration of a Leaflet/Mapbox frontend.
 - [ ] **Multi-Session Handling**: Support for multiple account cookies.
 
-## Disclaimer
+## ⚖️ Disclaimer
 
-> [!WARNING]
-> This project is for **educational purposes only**. It is intended to demonstrate how to interact with public APIs using native Node.js. Use it responsibly and respect the Terms of Service of FlightRadar24. The author is not responsible for any misuse of this software.
+> [!CAUTION]
+> ### NUR UND AUSSCHLIESSLICH FÜR EDUCATIONAL PURPOSES
+> Dieses Projekt dient **einzig und allein Bildungszwecken**. Es soll demonstrieren, wie man mit nativen Node.js-Tools mit öffentlichen APIs interagiert. Die Nutzung erfolgt auf eigene Gefahr. Bitte respektiere die Terms of Service von FlightRadar24. Der Autor übernimmt keine Haftung für Missbrauch oder Schäden.
 
 ---
 
