@@ -1,7 +1,7 @@
 # FlightRadar24 REST API (Native Node.js)
 
 <p align="center">
-  [Auf Deutsch lesen (German) 🇩🇪](README_DE.md)
+  <a href="README_DE.md">Auf Deutsch lesen (German) 🇩🇪</a>
 </p>
 
 <p align="center">
