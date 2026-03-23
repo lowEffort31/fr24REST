@@ -10,17 +10,19 @@
   <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square" alt="License: MIT">
   </a>
+  <img src="https://img.shields.io/github/languages/code-size/jonaskroedel/fr24REST?style=flat-square" alt="Code Size">
+  <img src="https://img.shields.io/github/actions/workflow/status/jonaskroedel/fr24REST/ci.yml?branch=main&style=flat-square" alt="Build Status">
 </p>
 
 A high-performance, native REST-API for FlightRadar24 flight data, optimized for local development and Vercel Serverless. Designed without external SDK dependencies, using pure Node.js.
 
 <p align="center">
   <a href="#quickstart">Quickstart</a> •
+  <a href="#web-console">Web Console</a> •
   <a href="#usage-examples">Usage Examples</a> •
-  <a href="#query-parameters">Parameters</a> •
   <a href="#authentication">Authentication</a> •
-  <a href="#complete-javascript-example">Full Example</a> •
   <a href="#vercel-serverless-deployment">Deployment</a> •
+  <a href="#roadmap">Roadmap</a> •
   <a href="#disclaimer">Disclaimer</a>
 </p>
 
@@ -34,21 +36,51 @@ A high-performance, native REST-API for FlightRadar24 flight data, optimized for
 
 ## 🛠 Tech Stack
 
-<p align="left">
+<div align="center">
   <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js">
   <img src="https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express">
   <img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel">
   <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript">
-</p>
+</div>
 
-## Quickstart
+## 🏗 Architecture & Cleanup
+
+Das Projekt wurde für maximale Wartbarkeit und Performanz optimiert:
+- **Unified Logic**: Alle API-Routen und Logiken befinden sich zentral in `app.js`.
+- **Local & Serverless**: Sowohl `server.js` (lokal) als auch `api/fr24/index.js` (Vercel) nutzen den identischen Code. Keine doppelten Anpassungen mehr nötig!
+- **Vercel Ready**: Dank `vercel.json` wird das gesamte Projekt (inkl. Frontend) nahtlos in der Cloud ausgeführt.
+
+---
+
+## 🚀 Quickstart
 
 ```bash
+# Clone & Install
 git clone https://github.com/jonaskroedel/fr24REST.git
 cd fr24REST
 npm install
+
+# Setup Environment (Optional for Auto-Auth)
+cp .env.example .env
+# Edit .env with your FR24 credentials
+
+# Start Server
 node server.js
 ```
+
+## 🖥 Web Console
+
+Das Projekt enthält eine integrierte, stylische Konsole zum visuellen Testen der API. Starte den Server und öffne:
+**[http://localhost:3000](http://localhost:3000)**
+
+---
+
+## 📥 API Collection
+
+Für schnelles Testen mit **Insomnia** oder **Postman** kannst du die mitgelieferte Collection importieren:
+👉 [insomnia_collection.json](insomnia_collection.json)
+
+---
 
 ## Usage Examples
 
@@ -79,6 +111,9 @@ const { data } = await response.json();
 console.log(`Tracking flight ${data.id} (${data.callsign})`);
 ```
 
+> [!TIP]
+> Check out the [examples/](examples/) directory for complete, standalone scripts in **JavaScript** and **Python**.
+
 ### 2. Extended Data (Opt-in)
 
 Include airplane photos and full historical coordinate trails.
@@ -92,22 +127,11 @@ curl -s "http://localhost:3000/api/flight/LH400?photos=true&trail=true"
 
 ## Authentication
 
-### Login required for more insights
-Certain data fields (like advanced history or restricted flight details) may require a valid session. Use the `/api/login` endpoint to authenticate.
+### Native Auto-Login
+Wenn du deine Zugangsdaten in einer `.env` Datei speicherst (`FR24_EMAIL` & `FR24_PASSWORD`), authentifiziert sich die API bei Bedarf automatisch. 
 
-#### Python (Login & Authenticated Request)
-```python
-import requests
-
-# 1. Login to get session data
-credentials = {"email": "your@email.com", "password": "yourpassword"}
-login_res = requests.post("http://localhost:3000/api/login", json=credentials)
-session_data = login_res.json()
-
-# 2. subsequent requests use the session cookies
-# Note: The serverless version requires you to manage session persistence if needed.
-print("Successfully logged in:", session_data['success'])
-```
+### Manueller Login
+Alternativ kannst du den `/api/login` Endpoint nutzen:
 
 #### JavaScript (Login)
 ```javascript
@@ -121,10 +145,7 @@ const result = await response.json();
 console.log("Login Status:", result.success);
 ```
 
-## Query Parameters
-
-You can customize the response of the `/api/flight/:code` endpoint using the following opt-in parameters:
-
+### For /api/flight/:code
 | Parameter | Type | Description |
 | :--- | :--- | :--- |
 | `full` | `boolean` | Returns the entire raw dataset and all breadcrumbs. |
@@ -132,59 +153,13 @@ You can customize the response of the `/api/flight/:code` endpoint using the fol
 | `trail` | `boolean` | (Opt-in) Includes detailed flight path coordinates. |
 | `airports` | `boolean` | (Opt-in) Includes full metadata for origin/destination. |
 
----
-
-## ⚡ Complete JavaScript Example
-
-This example demonstrates how to fetch all flights in a specific region and retrieve detailed information for the first live flight found.
-
-```javascript
-// Example: Tracking Europe
-const BASE_URL = "http://localhost:3000/api";
-
-async function trackRegion(zone) {
-    try {
-        console.log(`📡 Fetching live flights for zone: ${zone}...`);
-        const listRes = await fetch(`${BASE_URL}/flights?zone=${zone}`);
-        const { data: flights } = await listRes.json();
-
-        if (flights.length === 0) return console.log("No flights found.");
-
-        const target = flights[0];
-        console.log(`📍 Found ${flights.length} flights. Fetching details for ${target.callsign}...`);
-
-        // Fetch details with photos and trail enabled
-        const detailRes = await fetch(`${BASE_URL}/flight/${target.id}?photos=true&trail=true`);
-        const { data: details } = await detailRes.json();
-
-        console.log("\n--- Flight Report ---");
-        console.log(`Flight: ${details.number} (${details.callsign})`);
-        console.log(`Aircraft: ${details.aircraft.model.text} (${details.aircraft.registration})`);
-        console.log(`Route: ${details.origin.name} -> ${details.destination.name}`);
-        console.log(`Status: ${details.status.text}`);
-        console.log(`Breadcrumbs: Found ${details.trail.length} coordinates.`);
-        console.log(`Photos: ${details.aircraft.images.thumbnails.length} images available.`);
-    } catch (err) {
-        console.error("Tracking Error:", err.message);
-    }
-}
-
-trackRegion("europe");
-```
-
-### Example Output:
-```text
-📡 Fetching live flights for zone: europe...
-📍 Found 1420 flights. Fetching details for DLH400...
-
---- Flight Report ---
-Flight: LH400 (DLH400)
-Aircraft: Airbus A340-642 (D-AIHZ)
-Route: Frankfurt Airport -> New York John F. Kennedy International Airport
-Status: Estimated- 14:50
-Breadcrumbs: Found 124 coordinates.
-Photos: 5 images available.
-```
+### For /api/airports/:code
+| Parameter | Type | Description |
+| :--- | :--- | :--- |
+| `weather` | `boolean` | (Opt-in) Includes current METAR and weather data. |
+| `schedule` | `boolean` | (Opt-in) Includes airport arrivals and departures. |
+| `runways` | `boolean` | (Opt-in) Includes runway technical data. |
+| `aircraftCount` | `boolean` | (Opt-in) Includes stats on ground/air aircraft. |
 
 ---
 
@@ -195,6 +170,13 @@ Deploying to Vercel is streamlined for stateless execution:
 ```bash
 vercel --prod
 ```
+
+## 🗺 Roadmap
+
+- [ ] **Real-time Webhook Support**: Push updates to external endpoints.
+- [ ] **Protobuf Support**: Native decoding for even higher performance.
+- [ ] **Interactive Map**: Integration of a Leaflet/Mapbox frontend.
+- [ ] **Multi-Session Handling**: Support for multiple account cookies.
 
 ## Disclaimer
 
@@ -212,11 +194,13 @@ vercel --prod
 </div>
 
 ## Repository Structure
-- `/api/fr24/`: Vercel Serverless function entry point.
-- `/services/`: Core request and scraper logic.
-- `/models/`: Data mapping and entity definitions.
-- `server.js`: Local development listener.
-- `vercel.json`: Vercel routing configuration.
+- `app.js`: Zentrale Express-App (Shared Logic).
+- `/api/fr24/`: Vercel Serverless Entry Point.
+- `/services/`: Core Request- & Scraper-Logik.
+- `/models/`: Daten-Mapping & Entity-Definitionen.
+- `/public/`: Frontend (Interactive Console).
+- `server.js`: Lokaler Express Listener.
+- `vercel.json`: Vercel Routing & Konfiguration.
 
 ---
 

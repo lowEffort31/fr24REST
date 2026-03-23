@@ -1,0 +1,71 @@
+{
+    "_type": "export",
+    "__export_format": 4,
+    "__export_date": "2026-03-23T18:15:00.000Z",
+    "__export_source": "insomnia.desktop.app:v8.6.1",
+    "resources": [
+        {
+            "_id": "wrk_fr24",
+            "parentId": null,
+            "modified": 1711217700000,
+            "created": 1711217700000,
+            "name": "FlightRadar24 REST API",
+            "description": "Native API for FlightRadar24 tracking data",
+            "scope": "collection",
+            "_type": "workspace"
+        },
+        {
+            "_id": "env_local",
+            "parentId": "wrk_fr24",
+            "modified": 1711217700000,
+            "created": 1711217700000,
+            "name": "Local Environment",
+            "data": {
+                "base_url": "http://localhost:3000/api"
+            },
+            "dataPropertyOrder": {
+                "&": ["base_url"]
+            },
+            "color": null,
+            "isPrivate": false,
+            "metaSortKey": 1711217700000,
+            "_type": "environment"
+        },
+        {
+            "_id": "req_flights",
+            "parentId": "wrk_fr24",
+            "url": "{{ base_url }}/flights?zone=europe",
+            "name": "Get Flights (Europe)",
+            "method": "GET",
+            "_type": "request"
+        },
+        {
+            "_id": "req_details",
+            "parentId": "wrk_fr24",
+            "url": "{{ base_url }}/flight/LH400?full=true",
+            "name": "Get Flight Details (LH400)",
+            "method": "GET",
+            "_type": "request"
+        },
+        {
+            "_id": "req_airports",
+            "parentId": "wrk_fr24",
+            "url": "{{ base_url }}/airports/FRA",
+            "name": "Get Airport (FRA)",
+            "method": "GET",
+            "_type": "request"
+        },
+        {
+            "_id": "req_login",
+            "parentId": "wrk_fr24",
+            "url": "{{ base_url }}/login",
+            "method": "POST",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n  \"email\": \"your@email.com\",\n  \"password\": \"yourpassword\"\n}"
+            },
+            "name": "Login",
+            "_type": "request"
+        }
+    ]
+}

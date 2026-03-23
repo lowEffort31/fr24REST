@@ -8,13 +8,32 @@ const DEFAULT_HEADERS = {
   'Origin': 'https://www.flightradar24.com',
 };
 
+const FIXED_ZONES = {
+  europe: { tl_y: 72.57, tl_x: -16.96, br_y: 33.57, br_x: 53.05 },
+  northamerica: { tl_y: 72.82, tl_x: -179.14, br_y: 14.54, br_x: -52.2 },
+  southamerica: { tl_y: 15.0, tl_x: -105.0, br_y: -60.0, br_x: -30.0 },
+  oceania: { tl_y: 10.0, tl_x: 100.0, br_y: -50.0, br_x: 180.0 },
+  asia: { tl_y: 75.0, tl_x: 40.0, br_y: -10.0, br_x: 150.0 },
+  africa: { tl_y: 40.0, tl_x: -20.0, br_y: -40.0, br_x: 60.0 }
+};
+
 class FR24Service {
   constructor() {
     this.session = null;
     this.cookies = "";
   }
 
-  getHeaders() {
+  async getHeaders() {
+    // Auto-login if credentials are in ENV and no cookies are set
+    if (!this.cookies && process.env.FR24_EMAIL && process.env.FR24_PASSWORD) {
+        try {
+            console.log("🔐 Auto-authenticating with environment credentials...");
+            await this.login(process.env.FR24_EMAIL, process.env.FR24_PASSWORD);
+        } catch (e) {
+            console.error("⚠️ Auto-authentication failed:", e.message);
+        }
+    }
+
     const headers = { ...DEFAULT_HEADERS };
     if (this.cookies) {
       headers['Cookie'] = this.cookies;
@@ -68,9 +87,20 @@ class FR24Service {
    * Fetch flights from Data Cloud feed
    */
   async getFlights(params = {}) {
+    let bounds = params.bounds || '';
+    
+    // If zone is provided but bounds are not, look up the zone coordinates
+    if (params.zone && !bounds) {
+        const zoneData = FIXED_ZONES[params.zone.toLowerCase()];
+        if (zoneData) {
+            // FR24 Bounds Format: y2,y1,x1,x2 (Top, Bottom, Left, Right)
+            bounds = `${zoneData.tl_y},${zoneData.br_y},${zoneData.tl_x},${zoneData.br_x}`;
+        }
+    }
+
     const baseUrl = 'https://data-cloud.flightradar24.com/zones/fcgi/feed.js';
     const query = new URLSearchParams({
-      bounds: params.bounds || '',
+      bounds: bounds,
       faa: '1', satellite: '1', mlat: '1', flarm: '1', adsb: '1', gnd: '1', air: '1', vehicles: '1', estimated: '1', ager: '1', gliders: '1', stats: '1'
     });
     
@@ -78,7 +108,8 @@ class FR24Service {
     if (params.zone) query.append('zone', params.zone);
 
     const url = `${baseUrl}?${query.toString()}`;
-    const response = await fetch(url, { headers: this.getHeaders() });
+    const headers = await this.getHeaders();
+    const response = await fetch(url, { headers });
     
     if (!response.ok) {
       throw new Error(`Failed to fetch flights: ${response.status} ${response.statusText}`);
@@ -100,7 +131,8 @@ class FR24Service {
    */
   async getAirlines() {
     const url = 'https://www.flightradar24.com/_json/airlines.php';
-    const response = await fetch(url, { headers: this.getHeaders() });
+    const headers = await this.getHeaders();
+    const response = await fetch(url, { headers });
     
     if (!response.ok) {
       throw new Error(`Failed to fetch airlines: ${response.status} ${response.statusText}`);
@@ -112,9 +144,17 @@ class FR24Service {
   /**
    * Fetch detailed airport information
    */
-  async getAirportDetails(code) {
-    const url = `https://data-live.flightradar24.com/clickhandler/?airport=${code}`;
-    const response = await fetch(url, { headers: this.getHeaders() });
+  async getAirportDetails(code, params = {}) {
+    let url = `https://api.flightradar24.com/common/v1/airport.json?code=${code}&plugin[]=details`;
+    
+    // Add optional plugins
+    if (params.weather === 'true' || params.weather === '1') url += '&plugin[]=weather';
+    if (params.schedule === 'true' || params.schedule === '1') url += '&plugin[]=schedule';
+    if (params.runways === 'true' || params.runways === '1') url += '&plugin[]=runways';
+    if (params.aircraftCount === 'true' || params.aircraftCount === '1') url += '&plugin[]=aircraftCount';
+
+    const headers = await this.getHeaders();
+    const response = await fetch(url, { headers });
     
     if (!response.ok) {
         if (response.status === 404) {
@@ -124,7 +164,14 @@ class FR24Service {
     }
     
     const data = await response.json();
-    return new Airport(data);
+    const airportRoot = data.result?.response?.airport;
+    const pluginData = airportRoot?.pluginData;
+    
+    if (!pluginData || !pluginData.details) {
+        throw new Error(`No data found for airport ${code}`);
+    }
+    
+    return new Airport(pluginData);
   }
 
   /**
@@ -132,7 +179,8 @@ class FR24Service {
    */
   async search(query) {
     const url = `https://www.flightradar24.com/v1/search/web/find?query=${encodeURIComponent(query)}&limit=10`;
-    const response = await fetch(url, { headers: this.getHeaders() });
+    const headers = await this.getHeaders();
+    const response = await fetch(url, { headers });
     
     if (!response.ok) {
       throw new Error(`Search failed: ${response.status} ${response.statusText}`);
@@ -161,7 +209,8 @@ class FR24Service {
     }
 
     const url = `https://data-live.flightradar24.com/clickhandler/?version=1.5&flight=${flightId}`;
-    const response = await fetch(url, { headers: this.getHeaders() });
+    const headers = await this.getHeaders();
+    const response = await fetch(url, { headers });
     
     if (!response.ok) {
       throw new Error(`Failed to fetch flight details: ${response.status} ${response.statusText}`);
@@ -179,16 +228,7 @@ class FR24Service {
    * Fetch zones
    */
   async getZones() {
-    const staticZones = {
-        europe: { tl_y: 72.57, tl_x: -16.96, br_y: 33.57, br_x: 53.05 },
-        northamerica: { tl_y: 72.82, tl_x: -179.14, br_y: 14.54, br_x: -52.2 },
-        southamerica: { tl_y: 15.0, tl_x: -105.0, br_y: -60.0, br_x: -30.0 },
-        oceania: { tl_y: 10.0, tl_x: 100.0, br_y: -50.0, br_x: 180.0 },
-        asia: { tl_y: 75.0, tl_x: 40.0, br_y: -10.0, br_x: 150.0 },
-        africa: { tl_y: 40.0, tl_x: -20.0, br_y: -40.0, br_x: 60.0 }
-    };
-    
-    return Object.entries(staticZones).map(([name, coords]) => new Zone(name, coords));
+    return Object.entries(FIXED_ZONES).map(([name, coords]) => new Zone(name, coords));
   }
 }
 

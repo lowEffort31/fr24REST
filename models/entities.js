@@ -6,15 +6,34 @@ class Flight {
     this.heading = data[3];
     this.altitude = data[4];
     this.speed = data[5];
-    this.origin = data[11];
-    this.destination = data[12];
-    this.airlineIcao = data[18];
+    this.radar = data[7];
+    this.model = data[8];
+    this.registration = data[9];
+    this.originCode = data[11];
+    this.destinationCode = data[12];
+    this.flightNumber = data[13];
+    this.callsign = data[16];
+    this.airline = data[18];
   }
 }
 
 class Airport {
-  constructor(data) {
-    this.details = data;
+  constructor(pluginData) {
+    const details = pluginData.details || {};
+    this.name = details.name;
+    this.code = details.code;
+    this.position = details.position;
+    this.timezone = details.timezone;
+    this.visible = details.visible;
+    this.website = details.website;
+    
+    // Optional plugins
+    if (pluginData.weather) this.weather = pluginData.weather;
+    if (pluginData.schedule) this.schedule = pluginData.schedule;
+    if (pluginData.runways) this.runways = pluginData.runways;
+    if (pluginData.aircraftCount) this.aircraftCount = pluginData.aircraftCount;
+    
+    this.raw = pluginData;
   }
 }
 
