@@ -1,12 +1,10 @@
+![LIFT](public/assets/header.jpg)
+
 # <p align="center">LIFT</p>
 
 <p align="center">
-  <b>/lɪft/ — Lightweight Interface for Flight Tracking</b><br>
+  <b>[lɪft] — Lightweight Interface for Flight Tracking</b><br>
   <i>The high-performance, native flight tracking engine for Node.js. Lightweight by design. Native by heart. 28KB of pure Serverless power.</i>
-</p>
-
-<p align="center">
-  <a href="README_DE.md">Auf Deutsch lesen (German) 🇩🇪</a>
 </p>
 
 <p align="center">
@@ -21,6 +19,10 @@
   </a>
   <img src="https://img.shields.io/github/languages/code-size/jonaskroedel/fr24REST?style=flat-square" alt="Code Size">
   <img src="https://img.shields.io/github/actions/workflow/status/jonaskroedel/fr24REST/ci.yml?branch=main&style=flat-square" alt="Build Status">
+</p>
+
+<p align="center">
+  <a href="README_DE.md">Auf Deutsch lesen (German) 🇩🇪</a>
 </p>
 
 ---

@@ -1,3 +1,5 @@
+![LIFT](public/assets/header.jpg)
+
 # <p align="center">LIFT</p>
 
 <p align="center">
@@ -5,9 +7,6 @@
   <i>Die hochperformante, native Flight-Tracking-Engine für Node.js. Schlank im Design. Nativ im Herzen. 28 KB pure Serverless-Power.</i>
 </p>
 
-<p align="center">
-  <a href="README.md">Read in English (English) 🇺🇸</a>
-</p>
 
 <p align="center">
   <a href="https://vercel.com">
@@ -21,6 +20,10 @@
   </a>
   <img src="https://img.shields.io/github/languages/code-size/jonaskroedel/fr24REST?style=flat-square" alt="Code-Größe">
   <img src="https://img.shields.io/github/actions/workflow/status/jonaskroedel/fr24REST/ci.yml?branch=main&style=flat-square" alt="Build-Status">
+</p>
+
+<p align="center">
+  <a href="README.md">Read in English (English) 🇺🇸</a>
 </p>
 
 ---
