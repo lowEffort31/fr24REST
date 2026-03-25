@@ -217,6 +217,10 @@
                 <span class="method-badge badge-get">GET</span>
                 <span>Airlines</span>
             </div>
+            <div class="nav-item" onclick="loadEndpoint('nearby')">
+                <span class="method-badge badge-get">GET</span>
+                <span>Nearby Scan</span>
+            </div>
         </div>
 
         <div class="nav-section">
@@ -228,6 +232,10 @@
             <div class="nav-item" onclick="loadEndpoint('airport')">
                 <span class="method-badge badge-get">GET</span>
                 <span>Airport Info</span>
+            </div>
+            <div class="nav-item" onclick="loadEndpoint('aircraft')">
+                <span class="method-badge badge-get">GET</span>
+                <span>Aircraft Lookup</span>
             </div>
             <div class="nav-item" onclick="loadEndpoint('login')">
                 <span class="method-badge badge-post">POST</span>
@@ -254,7 +262,7 @@
             },
             details: {
                 title: 'Flight Intelligence',
-                desc: 'Global lookup for detailed aircraft state, photos, and historical path.',
+                desc: 'Lookup for aircraft state, path, and calculated efficiency (delays, turnaround).',
                 url: '/api/flight/:code',
                 fields: [
                     { id: 'code', label: 'Flight Number or ID', type: 'text', default: 'LH400' },
@@ -265,14 +273,36 @@
             },
             airport: {
                 title: 'Airport Operations',
-                desc: 'Detailed metadata and operational status for an airport.',
+                desc: 'Metadata, Weather (METAR Summary), and Turnaround Intelligence.',
                 url: '/api/airports/:code',
                 fields: [
                     { id: 'code', label: 'IATA Code', type: 'text', default: 'FRA' },
-                    { id: 'weather', label: 'Include Weather', type: 'checkbox' },
-                    { id: 'schedule', label: 'Include Schedules', type: 'checkbox' },
+                    { id: 'registration', label: 'Filter by Registration (Optional)', type: 'text', placeholder: 'e.g. D-AIMG' },
+                    { id: 'weather', label: 'Include Weather & METAR', type: 'checkbox', default: true },
+                    { id: 'schedule', label: 'Include Schedules', type: 'checkbox', default: true },
                     { id: 'runways', label: 'Include Runways', type: 'checkbox' },
-                    { id: 'aircraftCount', label: 'Include Aircraft Count', type: 'checkbox' }
+                    { id: 'aircraftCount', label: 'Include Ground Stats', type: 'checkbox' }
+                ]
+            },
+            nearby: {
+                title: 'Nearby Scan',
+                desc: 'Find all aircraft within a specific radius of coordinates.',
+                url: '/api/nearby',
+                fields: [
+                    { id: 'lat', label: 'Latitude', type: 'text', default: '50.0333' },
+                    { id: 'lon', label: 'Longitude', type: 'text', default: '8.5705' },
+                    { id: 'radius', label: 'Radius (km)', type: 'text', default: '50' }
+                ]
+            },
+            aircraft: {
+                title: 'Aircraft Lookup',
+                desc: 'Specialized lookup for aircraft by registration (e.g. D-AIMG).',
+                url: '/api/aircraft/:code',
+                fields: [
+                    { id: 'code', label: 'Registration', type: 'text', default: 'D-AIMG' },
+                    { id: 'full', label: 'Full Data Mode', type: 'checkbox' },
+                    { id: 'photos', label: 'Include Photos', type: 'checkbox', default: true },
+                    { id: 'trail', label: 'Include Path Trail', type: 'checkbox', default: true }
                 ]
             },
             zones: { title: 'Geographical Zones', desc: 'Active world region coordinate boundaries.', url: '/api/zones', fields: [] },

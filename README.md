@@ -4,7 +4,7 @@
 
 <p align="center">
   <b>[lɪft] — Lightweight Interface for Flight Tracking</b><br>
-  <i>The high-performance, native flight tracking engine for Node.js. Lightweight by design. Native by heart. 28KB of pure Serverless power.</i>
+  <i>The high-performance, native flight tracking engine for Node.js. Lightweight by design. Native by heart. Now with Built-in **Intelligence Layer** for delays, METAR parsing, and turnaround analytics.</i>
 </p>
 
 <p align="center">
@@ -126,6 +126,12 @@ Includes airplane photos and full historical coordinate trails.
 ```bash
 # Add photos and breadcrumb trail
 curl -s "http://localhost:3000/api/flight/LH400?photos=true&trail=true"
+
+# Filter airport schedule by aircraft registration
+curl -s "http://localhost:3000/api/airports/FRA?registration=D-AIMG&schedule=true"
+
+# Nearby Scan (Lat/Lon/Radius)
+curl -s "http://localhost:3000/api/nearby?lat=50.03&lon=8.57&radius=50"
 ```
 
 ---
@@ -150,7 +156,14 @@ const result = await response.json();
 console.log("Login Status:", result.success);
 ```
 
-### Parameters for /api/flight/:code
+| `GET /api/flight/:code` | lookup | Detailed flight info + **Intelligence (Delay)**. |
+| `GET /api/aircraft/:code` | lookup | Aircraft state by Registration (Live-Redirect). |
+| `GET /api/nearby` | lookup | Find all aircraft within a specific radius (km). |
+| `GET /api/airports/:code` | intelligence | Metadata, **METAR Summary**, and **Turnarounds**. |
+| `GET /api/airlines` | directory | Official JSON index of tracked carriers. |
+| `GET /api/zones` | metadata | Geographic region boundaries. |
+
+### Parameters for /api/flight/:code & /api/aircraft/:code
 | Parameter | Type | Description |
 | :--- | :--- | :--- |
 | `full` | `boolean` | Returns the entire raw dataset and all breadcrumbs. |
@@ -161,6 +174,7 @@ console.log("Login Status:", result.success);
 ### Parameters for /api/airports/:code
 | Parameter | Type | Description |
 | :--- | :--- | :--- |
+| `registration` | `string` | (Opt-in) Filter schedule for a specific aircraft. |
 | `weather` | `boolean` | (Opt-in) Includes current METAR and weather data. |
 | `schedule` | `boolean` | (Opt-in) Includes airport arrivals and departures. |
 | `runways` | `boolean` | (Opt-in) Includes runway technical data. |

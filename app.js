@@ -95,6 +95,34 @@ app.get('/api/flight/:code', async (req, res, next) => {
   }
 });
 
+// GET /api/aircraft/:code: Detailed aircraft info by Registration (Alias for flight lookup)
+app.get('/api/aircraft/:code', async (req, res, next) => {
+    try {
+      const { code } = req.params;
+      const { full, photos, trail, airports } = req.query;
+      const details = await fr24Service.getFlightDetails(code); // Works for registration too
+      
+      // Apply same filter logic as flight endpoint
+      const isFull = full === 'true' || full === '1';
+      if (!isFull) {
+          if (airports !== 'true' && airports !== '1') {
+              if (details.origin) details.origin = { name: details.origin.name, iata: details.origin.code?.iata };
+              if (details.destination) details.destination = { name: details.destination.name, iata: details.destination.code?.iata };
+          }
+          if (photos !== 'true' && photos !== '1') if (details.aircraft) delete details.aircraft.images;
+          if (trail !== 'true' && trail !== '1') delete details.trail;
+          delete details.raw;
+      }
+      
+      res.json({ success: true, data: details });
+    } catch (error) {
+      if (error.message.includes('No live flight found')) {
+          return res.status(404).json({ success: false, error: `Aircraft ${req.params.code} is currently not tracked or on ground.` });
+      }
+      next(error);
+    }
+});
+
 // GET /api/airlines: Ruft die offizielle JSON-Liste der Airlines ab
 app.get('/api/airlines', async (req, res, next) => {
   try {
@@ -109,6 +137,7 @@ app.get('/api/airlines', async (req, res, next) => {
 app.get('/api/airports/:code', async (req, res, next) => {
   try {
     const { code } = req.params;
+    const { registration } = req.query;
     if (!code || code.length !== 3) {
       return res.status(400).json({ success: false, error: 'Invalid airport IATA code format' });
     }
@@ -127,6 +156,20 @@ app.get('/api/zones', async (req, res, next) => {
   try {
     const zones = await fr24Service.getZones();
     res.json({ success: true, count: zones.length, data: zones });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// GET /api/nearby: Find flights near coordinates
+app.get('/api/nearby', async (req, res, next) => {
+  try {
+    const { lat, lon, radius } = req.query;
+    if (!lat || !lon) {
+      return res.status(400).json({ success: false, error: 'Latitude and Longitude required' });
+    }
+    const flights = await fr24Service.getNearbyFlights(parseFloat(lat), parseFloat(lon), parseFloat(radius || 50));
+    res.json({ success: true, count: flights.length, data: flights });
   } catch (error) {
     next(error);
   }

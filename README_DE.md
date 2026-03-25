@@ -4,7 +4,7 @@
 
 <p align="center">
   <b>/lɪft/ — Lightweight Interface for Flight Tracking</b><br>
-  <i>Die hochperformante, native Flight-Tracking-Engine für Node.js. Schlank im Design. Nativ im Herzen. 28 KB pure Serverless-Power.</i>
+  <i>Die hochperformante, native Flight-Tracking-Engine für Node.js. Schlank im Design. Nativ im Herzen. Jetzt mit integriertem **Intelligence Layer** für Verspätungen, METAR-Parsing und Turnaround-Analysen.</i>
 </p>
 
 
@@ -127,6 +127,12 @@ Inklusive Flugzeugfotos und vollständiger historischer Pfad-Koordinaten.
 ```bash
 # Fotos und Flugpfad hinzufügen
 curl -s "http://localhost:3000/api/flight/LH400?photos=true&trail=true"
+
+# Flugplan eines Flughafens nach Registrierung filtern
+curl -s "http://localhost:3000/api/airports/FRA?registration=D-AIMG&schedule=true"
+
+# Umgebungs-Scan (Lat/Lon/Radius)
+curl -s "http://localhost:3000/api/nearby?lat=50.03&lon=8.57&radius=50"
 ```
 
 ---
@@ -151,17 +157,18 @@ const result = await response.json();
 console.log("Login-Status:", result.success);
 ```
 
-### Parameter für /api/flight/:code
-| Parameter | Typ | Beschreibung |
-| :--- | :--- | :--- |
-| `full` | `boolean` | Gibt den gesamten Rohdatensatz und alle Trackpunkte zurück. |
-| `photos` | `boolean` | (Opt-in) Enthält Galerien von Flugzeugfotos. |
-| `trail` | `boolean` | (Opt-in) Enthält detaillierte Flugpfad-Koordinaten. |
-| `airports` | `boolean` | (Opt-in) Enthält vollständige Metadaten für Start/Ziel. |
+### Parameter für /api/flight/:code & /api/aircraft/:code
+| `GET /api/flight/:code` | lookup | Detaillierte Fluginfo + **Intelligence (Delay)**. |
+| `GET /api/aircraft/:code` | lookup | Flugzeugstatus nach Registrierung (Live-Redirect). |
+| `GET /api/nearby` | lookup | Findet alle Flugzeuge in einem Umkreis (km). |
+| `GET /api/airports/:code` | intelligence | Metadaten, **METAR-Zusammenfassung** und **Turnarounds**. |
+| `GET /api/airlines` | directory | Offizieller JSON-Index der verzeichneten Airlines. |
+| `GET /api/zones` | metadata | Geografische Regionsgrenzen. |
 
 ### Parameter für /api/airports/:code
 | Parameter | Typ | Beschreibung |
 | :--- | :--- | :--- |
+| `registration` | `string` | (Opt-in) Filtert den Flugplan nach einer Registrierung. |
 | `weather` | `boolean` | (Opt-in) Enthält aktuelle METAR- und Wetterdaten. |
 | `schedule` | `boolean` | (Opt-in) Enthält Ankünfte und Abflüge des Flughafens. |
 | `runways` | `boolean` | (Opt-in) Enthält technische Daten der Startbahnen. |

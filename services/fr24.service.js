@@ -149,7 +149,7 @@ class FR24Service {
     
     // Add optional plugins
     if (params.weather === 'true' || params.weather === '1') url += '&plugin[]=weather';
-    if (params.schedule === 'true' || params.schedule === '1') url += '&plugin[]=schedule';
+    if (params.schedule === 'true' || params.schedule === '1' || params.registration) url += '&plugin[]=schedule';
     if (params.runways === 'true' || params.runways === '1') url += '&plugin[]=runways';
     if (params.aircraftCount === 'true' || params.aircraftCount === '1') url += '&plugin[]=aircraftCount';
 
@@ -169,6 +169,15 @@ class FR24Service {
     
     if (!pluginData || !pluginData.details) {
         throw new Error(`No data found for airport ${code}`);
+    }
+
+    // Filter by registration if requested (searches in schedule arrivals/departures)
+    if (params.registration && pluginData.schedule) {
+        const reg = params.registration.toLowerCase();
+        const filterFn = (item) => item.flight?.aircraft?.registration?.toLowerCase() === reg;
+        
+        pluginData.schedule.arrivals.data = pluginData.schedule.arrivals.data.filter(filterFn);
+        pluginData.schedule.departures.data = pluginData.schedule.departures.data.filter(filterFn);
     }
     
     return new Airport(pluginData);
@@ -229,6 +238,30 @@ class FR24Service {
    */
   async getZones() {
     return Object.entries(FIXED_ZONES).map(([name, coords]) => new Zone(name, coords));
+  }
+
+  /**
+   * Nearby Scan: Fetch flights within a radius (km) of coordinates
+   */
+  async getNearbyFlights(lat, lon, radius = 50) {
+    const latOffset = radius / 111;
+    const lonOffset = radius / (111 * Math.cos(lat * Math.PI / 180));
+    
+    const bounds = {
+        tl_y: lat + latOffset,
+        tl_x: lon - lonOffset,
+        br_y: lat - latOffset,
+        br_x: lon + lonOffset
+    };
+
+    // Bounds format for getFlights: y2,y1,x1,x2
+    const boundsStr = `${bounds.tl_y.toFixed(4)},${bounds.br_y.toFixed(4)},${bounds.tl_x.toFixed(4)},${bounds.br_x.toFixed(4)}`;
+    const flights = await this.getFlights({ bounds: boundsStr });
+    
+    // Add Spatial Intelligence (Distance, Heading, Approach)
+    flights.forEach(f => f.calculateNeighborhood(lat, lon));
+    
+    return flights;
   }
 }
 
