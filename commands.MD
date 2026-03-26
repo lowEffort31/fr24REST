@@ -46,6 +46,20 @@ Detailed status, history, and intelligence for a flight number or hex ID.
 
 ---
 
+### GET `/api/flight/:code/history`
+Retrieve a comprehensive timeline of past and upcoming segments for a flight number.
+
+**Parameters:**
+- `limit` (int): Number of segments to return (Default: 25).
+
+**Key Fields:**
+- `data[]`: List of flight segments.
+- `data[].status`: `scheduled`, `landed`, `live`.
+- `data[].time`: Departure and arrival timestamps.
+- `data[].aircraft`: Registration and type of the specific segment.
+
+---
+
 ### GET `/api/aircraft/:code`
 Specialized lookup for an aircraft by its registration (e.g. `D-AIMG`).
 *Same parameters and intelligence features as `/api/flight/:code`.*

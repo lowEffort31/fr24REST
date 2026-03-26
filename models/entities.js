@@ -181,6 +181,10 @@ class FlightDetails {
     this.trail = data.trail;
     this.time = data.time;
     
+    // History & Schedule v4
+    this.recent = data.flightHistory?.recent || [];
+    this.scheduled = data.flightHistory?.scheduled || [];
+    
     // Intelligence Layer: Calculated Data
     this.intelligence = this.calculateIntelligence(data);
     

@@ -25,6 +25,15 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       }
     },
     {
+      name: "get_flight_history",
+      description: "Historical and scheduled segments for a flight number",
+      inputSchema: {
+        type: "object",
+        properties: { code: { type: "string" } },
+        required: ["code"]
+      }
+    },
+    {
       name: "get_airport",
       description: "Airport Operations + Weather Impact + Turnarounds",
       inputSchema: {
@@ -57,6 +66,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   let url = "";
   
   if (name === "get_flight") url = `${API_BASE_URL}/flight/${args.code}`;
+  else if (name === "get_flight_history") url = `${API_BASE_URL}/flight/${args.code}/history`;
   else if (name === "get_airport") url = `${API_BASE_URL}/airports/${args.code}?weather=true&schedule=true${args.registration ? `&registration=${args.registration}` : ''}`;
   else if (name === "nearby_scan") url = `${API_BASE_URL}/nearby?lat=${args.lat}&lon=${args.lon}&radius=${args.radius || 50}`;
 

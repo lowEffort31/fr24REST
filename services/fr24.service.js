@@ -1,11 +1,14 @@
 const { Flight, Airport, Zone, FlightDetails } = require('../models/entities');
 
 const DEFAULT_HEADERS = {
-  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+  'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
   'Accept-Language': 'en-US,en;q=0.9',
-  'Accept': 'application/json, text/plain, */*',
+  'Accept': '*/*',
   'Referer': 'https://www.flightradar24.com/',
   'Origin': 'https://www.flightradar24.com',
+  'Sec-Fetch-Dest': 'empty',
+  'Sec-Fetch-Mode': 'cors',
+  'Sec-Fetch-Site': 'same-site'
 };
 
 const FIXED_ZONES = {
@@ -182,12 +185,12 @@ class FR24Service {
     
     return new Airport(pluginData);
   }
-
+  
   /**
-   * Search for a flight or airport
+   * Search for flights, airports, airlines
    */
   async search(query) {
-    const url = `https://www.flightradar24.com/v1/search/web/find?query=${encodeURIComponent(query)}&limit=10`;
+    const url = `https://www-air-api.flightradar24.com/v1/search/web/find?query=${encodeURIComponent(query)}&limit=10`;
     const headers = await this.getHeaders();
     const response = await fetch(url, { headers });
     
@@ -196,6 +199,23 @@ class FR24Service {
     }
     
     return await response.json();
+  }
+
+  async getFlightHistory(query, limit = 25) {
+      const url = `https://api.flightradar24.com/common/v1/flight/list.json?query=${encodeURIComponent(query)}&fetchBy=flight&page=1&limit=${limit}`;
+      const headers = await this.getHeaders();
+      try {
+          const response = await fetch(url, { headers });
+          if (!response.ok) {
+            console.warn(`History fetch failed: ${response.status}.`);
+            return [];
+          }
+          const data = await response.json();
+          return data.result?.response?.data || [];
+      } catch (e) {
+          console.warn("History fetch error:", e.message);
+          return [];
+      }
   }
 
   /**
@@ -209,10 +229,16 @@ class FR24Service {
     
     if (!isHex) {
         const results = await this.search(code);
-        // Find live flight or specifically matching flight number in results
-        const flightResult = results.results?.find(r => r.type === 'live' || (r.id && r.id.length === 8 && /^[0-9a-f]+$/i.test(r.id)));
+        // Find any valid flight result (live, schedule, or recently finished)
+        // Usually these have an 8-character hex ID or are explicitly typed
+        const flightResult = results.results?.find(r => 
+            r.type === 'live' || 
+            r.type === 'schedule' || 
+            (r.id && r.id.length >= 8)
+        );
+        
         if (!flightResult) {
-            throw new Error(`No live flight found for ${code}`);
+            throw new Error(`No flight data found for ${code}`);
         }
         flightId = flightResult.id;
     }

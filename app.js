@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
+require('dotenv').config();
 const fr24Service = require('./services/fr24.service');
 
 const app = express();
@@ -41,6 +42,20 @@ app.post('/api/login', async (req, res, next) => {
   } catch (error) {
     res.status(401).json({ success: false, error: error.message });
   }
+});
+
+/**
+ * GET /api/flight/:code/history
+ * Detailed historical and upcoming segments for a flight number
+ */
+app.get('/api/flight/:code/history', async (req, res) => {
+    try {
+        const { code } = req.params;
+        const history = await fr24Service.getFlightHistory(code);
+        res.json({ success: true, count: history.length, data: history });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
 });
 
 // GET /api/flight/:code: Detailed flight info (Hex ID or Flight Number)
